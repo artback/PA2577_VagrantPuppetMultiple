@@ -19,12 +19,6 @@ class nodejs {
               require => Exec['apt-update'],
   }
 }
-class install(String $package) {
-  package { $package:
-    ensure    => installed,
-    require => Exec['apt-update'],
-  }
-}
 
 node 'appserver.lan' {
   include update
@@ -34,10 +28,13 @@ node 'appserver.lan' {
 
 node 'dbserver.lan' {
     include update
-    include install('mysql-server')
+    package { 'mysql-server':
+      ensure    => installed,
+      require => Exec['apt-update'],
+    }
     exec { 'set-mysql-password':
       path => ['/bin', '/usr/bin'],
-      command => "mysqladmin -u root password hejhej123",
+      command => "mysqladmin -u root password root",
       require => Service['mysql'],
     }
     service { "mysql":
@@ -49,7 +46,10 @@ node 'dbserver.lan' {
 
 node 'web.lan'  {
   include update
-  include install('nginx')
+  package { 'nginx':
+    ensure    => installed,
+    require => Exec['apt-update'],
+  }
   service { "nginx":
     ensure => "running",
            enable => "true",
