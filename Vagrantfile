@@ -1,6 +1,6 @@
 Vagrant.configure(2) do |config|
 config.vm.box = "bento/ubuntu-18.04"
-
+config.vm.network "private_network", type: "dhcp"
 config.vm.provision "shell", inline: <<-SHELL
   wget https://apt.puppetlabs.com/puppet5-release-$(lsb_release -cs).deb
   dpkg -i puppet5-release-$(lsb_release -cs).deb
@@ -31,5 +31,10 @@ end
     test.vm.hostname = "tst-#{i}"
   end
 end
+
+
+config.vm.provision "shell", inline: <<-SHELL
+  apt-get install -y avahi-daemon libnss-mdns
+SHELL
 
 end
